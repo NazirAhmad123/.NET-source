@@ -1,0 +1,7 @@
+C:\Users\Nazir Sz\source\repos\BookList\BookList\bin\Debug\BookList.exe.config
+C:\Users\Nazir Sz\source\repos\BookList\BookList\bin\Debug\BookList.exe
+C:\Users\Nazir Sz\source\repos\BookList\BookList\bin\Debug\BookList.pdb
+C:\Users\Nazir Sz\source\repos\BookList\BookList\obj\Debug\BookList.csprojAssemblyReference.cache
+C:\Users\Nazir Sz\source\repos\BookList\BookList\obj\Debug\BookList.csproj.CoreCompileInputs.cache
+C:\Users\Nazir Sz\source\repos\BookList\BookList\obj\Debug\BookList.exe
+C:\Users\Nazir Sz\source\repos\BookList\BookList\obj\Debug\BookList.pdb
