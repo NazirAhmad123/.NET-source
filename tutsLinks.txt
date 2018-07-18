@@ -1,0 +1,6 @@
+https://www.tektutorialshub.com/linq-to-entities-finding-the-single-entity/
+
+https://msdn.microsoft.com/en-us/library/system.data.entity.database.sqlquery(v=vs.113).aspx
+
+https://code.msdn.microsoft.com/101-LINQ-Samples-3fb9811b
+
