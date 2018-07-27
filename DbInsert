@@ -1,0 +1,4 @@
+INSERT INTO Member
+(MemberID, MemberName)
+VALUES
+(NEWID(), 'Arif')
