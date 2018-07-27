@@ -1,4 +1,27 @@
+1.
 INSERT INTO Member
 (MemberID, MemberName)
 VALUES
 (NEWID(), 'Arif')
+
+
+
+
+
+
+
+
+
+
+2.
+USE [UmbracoApi]
+GO
+
+INSERT INTO [dbo].[Product]
+           ([ProductID]
+           ,[ProductName]
+           ,[Price])
+     VALUES
+           (NEWID(), 'p5', 200)
+GO
+
