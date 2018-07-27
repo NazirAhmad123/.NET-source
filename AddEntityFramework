@@ -1,0 +1,20 @@
+static void Add()
+        {
+            //Console.WriteLine("Nothing");
+           
+            using (var db = new UmbracoApiEntities())
+            {
+                var book = new Product()
+                {
+                    // var input = Console.ReadLine();
+
+                    ProductID = Guid.NewGuid(),
+                    Name = "P1",
+                    Price = 200
+                };
+                db.Products.Add(book);
+                db.SaveChanges();
+                
+            }
+
+        }
