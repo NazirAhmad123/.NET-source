@@ -1,0 +1,64 @@
+@using Sitecore.XA.Foundation.MarkupDecorator.Extensions
+@using Sitecore.XA.Foundation.RenderingVariants.Extensions
+@using Sitecore.XA.Foundation.RenderingVariants.Fields
+@using Sitecore.XA.Foundation.SitecoreExtensions.Extensions
+@using Sitecore.XA.Foundation.Variants.Abstractions.Fields
+@using CustomHelpers
+@using Sitecore.Data.Items;
+@using Sitecore.Data.Fields;
+@model Sitecore.XA.Foundation.Variants.Abstractions.Models.VariantsRenderingModel
+
+@if (Model.DataSourceItem != null || Html.Sxa().IsEdit)
+{
+    <div @Html.Sxa().Component(Model.Rendering.RenderingCssClass ?? "promo", Model.Attributes)>
+        <div class="component-content">
+            @if (Model.DataSourceItem == null)
+            {
+                @Model.MessageIsEmpty
+            }
+            else
+            {
+                using (Html.Sxa().BeginEditFrame(Model.DataSourceItem.ID.ToString(), "Nazir", Model.IsControlEditable))
+                {
+                    <h4>@Html.Sitecore().Field("Title", Model.DataSourceItem)</h4>
+
+                    <h4>@Html.Sitecore().Field("Description", Model.DataSourceItem)</h4>
+
+                    if (Html.Sxa().IsEdit)
+                    {
+                        @Html.Sitecore().Field("Image", Model.DataSourceItem)
+
+                    }
+                    else
+                    {
+                        <img src="@SitecoreHelpers.GetMediaItemUrl(Model.DataSourceItem,"Image")" />
+                    }
+
+
+
+                   MultilistField mfField = Model.DataSourceItem.Fields["Multilist"];
+                    foreach (Item myItem in mfField.GetItems())
+                    {
+                        <p>@myItem.Name</p>
+                    }
+
+             
+                   LookupField dropLink = Model.DataSourceItem.Fields["Droplink"];
+                   <p>@dropLink.TargetItem.Name</p>
+
+
+                  CheckboxField ch_fields = Model.DataSourceItem.Fields["Options"];
+                    if (ch_fields.Checked == true)
+                    {
+                        @ch_fields.Checked
+
+                       
+                    }
+
+                }
+
+            }
+
+        </div>
+    </div>
+}
