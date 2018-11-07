@@ -1,0 +1,74 @@
+@using Sitecore.XA.Foundation.MarkupDecorator.Extensions
+@using Sitecore.XA.Foundation.RenderingVariants.Extensions
+@using Sitecore.XA.Foundation.RenderingVariants.Fields
+@using Sitecore.XA.Foundation.SitecoreExtensions.Extensions
+@using Sitecore.XA.Foundation.Variants.Abstractions.Fields
+@model Sitecore.XA.Foundation.Variants.Abstractions.Models.VariantsRenderingModel
+
+@if (Model.DataSourceItem != null || Html.Sxa().IsEdit)
+{
+    <div @Html.Sxa().Component(Model.Rendering.RenderingCssClass ?? "video", Model.Attributes)>
+        <div class="component-content">
+            @if(Model.DataSourceItem == null)
+            {
+                @Model.MessageIsEmpty
+            }
+            else
+            {
+                using (Html.Sxa().BeginEditFrame(Model.DataSourceItem.ID.ToString(), "Video CF", Model.IsControlEditable))
+                {
+
+                    string videoId = Model.DataSourceItem.Fields["Video Reference ID"].Value;
+                    if (string.IsNullOrEmpty(videoId))
+                    {
+                        if (Html.Sxa().IsEdit)
+                        {
+                            <p>Error: No video reference ID specified</p>
+                        }
+                        else
+                        {
+                            <p>No video</p>
+                        }
+                    }
+                    else
+                    {
+                        string videoLink = "https://www.youtube.com/embed/" + videoId;
+                        string thumbnailLink = "https://img.youtube.com/vi/" + videoId + "/mqdefault.jpg";
+                        if (Html.Sxa().IsEdit)
+                        {
+                            <p>Video link: @videoLink</p>
+                        }
+                        else
+                        {
+                            <div class="videos-container">
+                                <div class="videoModal">
+                                    <div class="video-thumbnail">
+                                        <div class="video-thumbnail--img" style="background: transparent url('@thumbnailLink') no-repeat center center; background-size:cover;"></div>
+                                        <div class="video-play-btn">
+                                            <svg class="svg-icon" height="85" width="85" fill="#fd0364">
+                                                <use xlink:href="-/media/Themes/Evolution-Wellness/Celebrity-Fitness/CF-Base/Base/images/svg/sprite-symbol.svg#play-circle"></use>
+                                            </svg>
+                                        </div>
+                                        <div class="video-content d-none">
+                                            <div class="video-popup">
+                                                <a class="close-btn close-btn-x close-box d-none"><span class="icon-close"></span></a>
+                                                <iframe src="@videoLink" frameborder="0" allowfullscreen allow="autoplay; encrypted-media"></iframe>
+                                            </div>
+                                        </div>
+                                        <iframe class="w-100" src="@videoLink" frameborder="0" allowfullscreen allow="autoplay; encrypted-media"></iframe>
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                    }
+                }
+
+                <!--DO NOT TOUCH THIS-->
+                foreach (BaseVariantField variantField in Model.VariantFields)
+                {
+                    @Html.RenderingVariants().RenderVariant(variantField, Model.Item, Model.RenderingWebEditingParams, Model)
+                }
+            }
+        </div>
+    </div>
+}
