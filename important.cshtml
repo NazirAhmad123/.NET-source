@@ -1,0 +1,527 @@
+@using Sitecore.XA.Foundation.MarkupDecorator.Extensions
+@using Sitecore.XA.Foundation.RenderingVariants.Extensions
+@using Sitecore.XA.Foundation.RenderingVariants.Fields
+@using Sitecore.XA.Foundation.SitecoreExtensions.Extensions
+@using Sitecore.XA.Foundation.Variants.Abstractions.Fields
+@using Sitecore.Resources.Media;
+@using Sitecore.Data;
+@using Sitecore.Data;
+@using CustomHelpers;
+@model Sitecore.XA.Foundation.Variants.Abstractions.Models.VariantsRenderingModel
+
+@if (Model.DataSourceItem != null || Html.Sxa().IsEdit)
+{
+    const string CLUB_DETAIL_PAGE_TEMPLATE_ID = "{7DE11900-F0AD-41E1-B403-44F61F7CAAD0}";
+    const string EVENT_DETAIL_PAGE_TEMPLATE_ID = "{A08DF7AC-1763-4EC3-BCFD-87E7E0E0067F}";
+    <div @Html.Sxa().Component(Model.Rendering.RenderingCssClass ?? "hero-banner", Model.Attributes)>
+        <div class="component-content">
+            @if (Model.DataSourceItem == null)
+            {
+                @Model.MessageIsEmpty
+            }
+            else
+            {
+
+                var colour = (Sitecore.Data.Fields.LookupField)Model.DataSourceItem.Fields["Title and Line Colour"];
+                var colourItem = colour.TargetItem;
+                var colourClass = "light";
+                if (colourItem != null)
+                {
+                    colourClass = colourItem.Fields["Colour code"].Value;
+                }
+
+                string imgUrl = SitecoreHelpers.GetMediaItemUrl(Model.DataSourceItem, "Image");
+                string mobileImgUrl = SitecoreHelpers.GetMediaItemUrl(Model.DataSourceItem, "Mobile Image");
+
+                Sitecore.Data.Fields.DateField eventStartDateField = null;
+                string eventStartDate = string.Empty;
+
+
+                bool isEventPage = false;
+
+                if (Model.PageItem.TemplateID == ID.Parse(EVENT_DETAIL_PAGE_TEMPLATE_ID))
+                {
+                    isEventPage = true;
+                    eventStartDateField = (Sitecore.Data.Fields.DateField)Model.PageItem.Fields["Start Date"];
+                    eventStartDate = eventStartDateField.DateTime.ToString("yyyy-MM-dd HH:mm:ss");
+                }
+                bool isClubPage = false;
+                string clubStatus = string.Empty;
+                if (Model.PageItem.TemplateID == ID.Parse(CLUB_DETAIL_PAGE_TEMPLATE_ID))
+                {
+                    isClubPage = true;
+                    clubStatus = Model.PageItem.Fields["Club Status"].Value;
+                }
+                using (Html.Sxa().BeginEditFrame(Model.DataSourceItem.ID.ToString(), "Hero Banner", Model.IsControlEditable))
+                {
+                    <div class="row banner-wrapper" data-desktop-image="@imgUrl" , data-mobile-image="@mobileImgUrl">
+                        <div class="homebanner @(isEventPage ? "countdown-banner" : "")" data-start-time="@eventStartDate">
+                            
+                                <div class="title-with-description @colourClass large  @(isEventPage ? "fluid" : "")">
+
+                                    <h2 class="title">
+                                        @Html.Sitecore().Field("Title", Model.DataSourceItem)
+                                        @if (isClubPage)
+                                        {
+                                            <sup class="sup">@clubStatus</sup>
+                                        }
+
+                                    </h2>
+                                    @if (isClubPage)
+                                    {
+                                        var clubType = (Sitecore.Data.Fields.LookupField)Model.PageItem.Fields["Club Type"];
+                                        if (clubType.TargetItem != null)
+                                        {
+                                            <div class="club-type">@clubType.TargetItem.Fields["Display Name"]</div>
+
+                                        }
+                                    }
+                                    @{
+                                        bool showSeparator = true;
+                                    }
+                                    @if (string.IsNullOrEmpty(Model.DataSourceItem.Fields["Title"].Value) && string.IsNullOrEmpty(Model.DataSourceItem.Fields["Description"].Value))
+                                    {
+                                        showSeparator = false;
+                                    }
+                                    @if (showSeparator)
+                                    {
+                                        <div class="seperator"></div>
+                                    }
+                                    @if (isEventPage && ((Sitecore.Data.Fields.CheckboxField)Model.PageItem.Fields["Enable countdown timer"]).Checked)
+                                    {
+                                        <div class="countdown-timer">
+                                            <div class="timer-slot days"><span class="count">00</span><span class="text">Days</span></div>
+                                            <div class="timer-slot hours"><span class="count">00</span><span class="text">Hours</span></div>
+                                            <div class="timer-slot minutes"><span class="count">00</span><span class="text">Minutes</span></div>
+                                            <div class="timer-slot seconds"><span class="count">00</span><span class="text">Seconds</span></div>
+                                        </div>
+                                    }
+                                    else
+                                    {
+
+                                        <div class="description">@Html.Sitecore().Field("Description", Model.DataSourceItem)</div>
+                                    }
+                                </div>
+                           
+                            <div class="button-next action-btn" data-action-name="scrollToSection" data-action-data=".initial-jump">
+                                <svg class="svg-icon" height="25" width="25" fill="white">
+                                    <use xlink:href="-/media/Themes/Evolution-Wellness/Fitness-First/Base/Fitness-First-Basic/images/svg/sprite-symbol.svg#dd-down-arrow"></use>
+                                </svg>
+                            </div>
+                        </div>
+                    </div>
+                }
+            }
+
+        </div>
+    </div>
+}
+
+
+
+
+// ...
+
+
+@using Sitecore.XA.Foundation.MarkupDecorator.Extensions
+@using Sitecore.XA.Foundation.RenderingVariants.Extensions
+@using Sitecore.XA.Foundation.RenderingVariants.Fields
+@using Sitecore.XA.Foundation.SitecoreExtensions.Extensions
+@using Sitecore.XA.Foundation.Variants.Abstractions.Fields
+@using Sitecore.Resources.Media
+@using Sitecore.Data
+@using Sitecore.Data.Fields;
+@using Sitecore.Data.Items;
+@using CustomHelpers
+@model Sitecore.XA.Foundation.Variants.Abstractions.Models.VariantsRenderingModel
+
+@if (Model.DataSourceItem != null || Html.Sxa().IsEdit)
+{
+    <div @Html.Sxa().Component(Model.Rendering.RenderingCssClass ?? "key-usp-tile", Model.Attributes)>
+        <div class="component-content">
+            @if (Model.DataSourceItem == null)
+            {
+                @Model.MessageIsEmpty
+            }
+            else
+            {
+                using (Html.Sxa().BeginEditFrame(Model.DataSourceItem.ID.ToString(), "Key USP Tile", Model.IsControlEditable))
+                {
+                    MultilistField dataSource = (MultilistField) Model.DataSourceItem.Fields["Data Source"];
+
+					 @foreach (Item item in dataSource.GetItems() )
+						{
+							Sitecore.Data.Fields.ImageField imageField = ((Sitecore.Data.Fields.ImageField)item.Fields["Tile Image"]);
+
+
+							
+
+							var image = imageField.MediaItem;
+							var imgUrl = "";
+							if (image != null)
+							{
+								imgUrl = MediaManager.GetMediaUrl(image);
+							}
+
+                    <div class="skew-tiles mt-md-50 mt-25">
+                       
+                            <div class="skew-tile-container">
+                                <div class="skew-tile">
+                                    <div class="skew-item"><img src="@imgUrl"><span class="title"> @item.Fields["Tile Title"]</span></div>
+                                </div>
+                                <a href="@SitecoreHelpers.GetItemUrl(item)" class="text-content">
+                                    <span class="title"> @item.Fields["Tile Title"]</span>
+                                    <div class="description font-light">@item.Fields["Tile Description"]</div><span class="btn btn-secondary">FIND OUT MORE</span>
+                                </a>
+                            </div>
+                        }
+                    </div>
+                }
+
+            }
+        </div>
+    </div>
+}
+
+
+
+// ...
+
+
+@using Sitecore.XA.Foundation.MarkupDecorator.Extensions
+@using Sitecore.XA.Foundation.RenderingVariants.Extensions
+@using Sitecore.XA.Foundation.RenderingVariants.Fields
+@using Sitecore.XA.Foundation.SitecoreExtensions.Extensions
+@using Sitecore.XA.Foundation.Variants.Abstractions.Fields
+@model Sitecore.XA.Foundation.Variants.Abstractions.Models.VariantsRenderingModel
+@using CustomExtensions;
+@using CustomHelpers;
+@using Sitecore.Data.Fields;
+@using Sitecore.Data.Items;
+
+
+@helper renderSectionLinks(string fieldName)
+    {
+        const string EXTERNAL_LINK_TEMPLATE_ID = "{D113FF28-6D99-4D25-BB20-EE155C87914F}";
+
+        var sectionLinks = (Sitecore.Data.Fields.MultilistField)Model.DataSourceItem.Fields[fieldName];
+        foreach (string itemId in sectionLinks.Items)
+        {
+            var item = Sitecore.Context.Database.GetItem(Sitecore.Data.ID.Parse(itemId));
+            if (item.TemplateID.ToString() != EXTERNAL_LINK_TEMPLATE_ID)
+            {
+                var megaMenuField = item.Fields["Mega Menu Title"];
+                <li><a class="link-black" href="@item.GetWebUrl()">@(megaMenuField != null ? megaMenuField.Value : "")</a></li>
+            }
+            else
+            {
+                var linkField = (LinkField)item.Fields["Link"];
+                var url = linkField.Url;
+                <li><a class="link-black" href="@url" target="_blank">@linkField.Text</a></li>
+            }
+        }
+
+}
+
+@helper renderSection(string fieldNamePrefix)
+    {
+        var sectionLinks = (Sitecore.Data.Fields.MultilistField)Model.DataSourceItem.Fields[fieldNamePrefix + " Links"];
+        <div class="mm-content-item mt-25 mt-lg-0 col-xs-12 col-md-2">
+
+            @if (sectionLinks.GetItems().Count() > 0)
+            {
+            <div class="mobile-collapse">
+                <div class="title-small">
+                    <div class="title font-medium font-italic down-arrow-icon">@Html.Sitecore().Field(fieldNamePrefix + " Label", Model.DataSourceItem)</div>
+                    <div class="font-icon arrow-down">></div>
+                    <div class="seperator"></div>
+                </div>
+                <ul class="collapse-area">
+                    @renderSectionLinks(fieldNamePrefix + " Links")
+                </ul>
+            </div>
+            }
+        </div>
+}
+@if (Model.DataSourceItem != null || Html.Sxa().IsEdit)
+{
+    <div @Html.Sxa().Component(Model.Rendering.RenderingCssClass ?? "component-mega-menu", Model.Attributes)>
+        <div class="component-content">
+            @if (Model.DataSourceItem == null)
+            {
+                @Model.MessageIsEmpty
+            }
+            else
+            {
+                using (Html.Sxa().BeginEditFrame(Model.DataSourceItem.ID.ToString(), "Mega Menu", Model.IsControlEditable))
+                {
+                    var dataSourceItem = Model.DataSourceItem;
+                    var siteInfo = dataSourceItem.GetSiteInfo();
+                    var rootPath = siteInfo.RootPath;
+                    var startItemPath = siteInfo.StartItem;
+                    var startItemFullPath = rootPath + startItemPath;
+                    var startItem = Sitecore.Context.Database.GetItem(startItemFullPath);
+                    var imgUrl = CustomHelpers.SitecoreHelpers.GetMediaItemUrl(Model.DataSourceItem, "Company Logo");
+                    Sitecore.Data.Fields.MultilistField sectionLinks = null;
+
+                    if (Html.Sxa().IsEdit)
+                    {
+                        <h3>Mega Menu</h3>
+                        <p>
+                            Desktop Logo:
+                            @Html.Sitecore().Field("Desktop Company Logo", Model.DataSourceItem)
+                        </p>
+
+                        <p>
+                            Mobile Logo:
+                            @Html.Sitecore().Field("Mobile Company Logo", Model.DataSourceItem)
+                        </p>
+
+                        <p>
+                            Scroll Logo:
+                            @Html.Sitecore().Field("Scroll Logo", Model.DataSourceItem)
+                        </p>
+                    }
+                    else
+                    {
+                        <div class="container-fluid">
+                            <div class="row">
+                                <div class="nav-bar">
+                                    <div class="left">
+                                        <a class="brand" href="/">
+                                            @{
+                                                string desktopCompanyLogo = SitecoreHelpers.GetMediaItemUrl(Model.DataSourceItem, "Desktop Company Logo");
+                                                string mobileCompanyLogo = SitecoreHelpers.GetMediaItemUrl(Model.DataSourceItem, "Mobile Company Logo");
+                                                string scrollCompanyLogo = SitecoreHelpers.GetMediaItemUrl(Model.DataSourceItem, "Scroll Logo");
+
+                                                if (!string.IsNullOrEmpty(desktopCompanyLogo))
+                                                {
+                                                    <img class="d-none d-lg-block desktop-logo" src="@desktopCompanyLogo" data-desktop-image="@desktopCompanyLogo" data-scroll-image="@scrollCompanyLogo" alt="Logo" />
+                                                }
+                                                if (!string.IsNullOrEmpty(mobileCompanyLogo))
+                                                {
+                                                    <img class="d-block d-lg-none mobile-logo" src="@mobileCompanyLogo" data-mobile-image="@mobileCompanyLogo" data-scroll-image="@scrollCompanyLogo" alt="Logo Mobile" />
+                                                }
+                                            }
+                                        </a>
+                                    </div>
+                                    <div class="right">
+                                        <a class="burger-menu" href="#"><img src="/-/media/Themes/Evolution Wellness/Fitness First/Base/Fitness First Basic/images/menu-burger.png" /></a>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="mega-menu content-side-padding pt-50 pt-md-100 pb-50 custom-scroll-bar">
+                                    <div class="mm-header">
+                                        <div class="close-btn-x">X</div>
+                                        <div class="lang-selector">
+                                            <div class="language-switcher hide-icons">
+                                                <div class="ls-item selected-item">
+                                                    <div class="my-flag-icon">
+                                                        <img src="/-/media/Project/Evolution-Wellness/Fitness-First/South-East-Asia/General/Flags/4x3/my.svg">
+                                                    </div>
+                                                    <span>Malaysia</span>
+                                                    <span class="seperator">
+                                                        |
+                                                    </span>
+                                                    <span>
+                                                        EN
+                                                    </span>
+                                                </div>
+                                                <div  class="language-list" data-simplebar>
+                                                    <ul >
+                                                        @{
+                                                            var languageSettingsPath = rootPath + "/Site Data/Language Switcher Settings";
+                                                        }
+                                                        @foreach (Item culture in Sitecore.Context.Database.GetItem(languageSettingsPath).Children)
+                                                        {
+                                                            var linkField = (Sitecore.Data.Fields.LinkField)culture.Fields["Link"];
+                                                            var flagImage = SitecoreHelpers.GetMediaItemUrl(culture, "Flag Image");
+                                                            <li>
+                                                                <a href="@linkField.GetFriendlyUrl()">
+                                                                    <div class="ls-item">
+                                                                        <div class="my-flag-icon">
+                                                                            <img src="@flagImage" />
+                                                                        </div>
+                                                                        <span>@culture.Fields["Country"].Value</span>
+                                                                        <span class="seperator">
+                                                                            |
+                                                                        </span>
+                                                                        <span>
+                                                                            @culture.Fields["Language"].Value
+                                                                        </span>
+                                                                    </div>
+                                                                </a>
+                                                            </li>
+                                                        }
+                                                    </ul>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="mm-content row">
+                                        @renderSection("Section 1")
+                                        @renderSection("Section 2")
+                                        @renderSection("Section 3")
+                                        @renderSection("Section 4")
+                                        <div class="mm-content-item mt-40 mt-lg-0 col-xs-12 col-md-1 d-flex justify-content-center h-100">
+                                            <div class="mm-seperator"> </div>
+                                        </div>
+                                        <div class="mm-content-item mt-40 mt-lg-0 col-xs-12 col-md-3">
+                                            <div class="title-small">
+                                                <div class="title font-medium font-italic">@Html.Sitecore().Field("Promotion Heading", Model.DataSourceItem)</div>
+                                            </div>
+                                            @{
+                                                var promotionId = Model.DataSourceItem.Fields["Promotion"].Value;
+                                                if (!string.IsNullOrEmpty(promotionId))
+                                                {
+                                                    var promotionItem = Sitecore.Context.Database.GetItem(Sitecore.Data.ID.Parse(promotionId));
+                                                    if (promotionItem != null)
+                                                    {
+                                                        <div class="thumbnail card-view mt-15">
+                                                            <img class="w-100" src="@SitecoreHelpers.GetMediaItemUrl(promotionItem,"Tile Image")" id="imagemegamenu" alt="" />
+                                                            <div class="caption">
+                                                                <div class="title-small">
+                                                                    <div class="title font-medium font-italic">@promotionItem.Fields["Tile Title"].Value</div>
+                                                                    <div class="seperator"></div>
+                                                                </div>
+                                                                <p>@promotionItem.Fields["Tile Description"].Value</p>
+                                                                <p><a class="btn btn-secondary" href="@SitecoreHelpers.GetItemUrl(promotionItem)" id="findoutmoremegamenu">FIND OUT MORE</a></p>
+                                                            </div>
+                                                        </div>
+                                                    }
+                                                }
+                                            }
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                }
+            }
+        </div>
+    </div>
+}
+
+
+
+//  ...
+
+
+@using Sitecore.XA.Foundation.MarkupDecorator.Extensions
+@using Sitecore.XA.Foundation.RenderingVariants.Extensions
+@using Sitecore.XA.Foundation.RenderingVariants.Fields
+@using Sitecore.XA.Foundation.SitecoreExtensions.Extensions
+@using Sitecore.XA.Foundation.Variants.Abstractions.Fields
+@using Sitecore.Data.Items
+@using Sitecore.Mvc.Presentation
+@using Sitecore.Mvc
+@model Sitecore.XA.Foundation.Variants.Abstractions.Models.VariantsRenderingModel
+
+@{
+    const string PriceTileDatasourceFieldID = "{7A687CB2-3DF8-4987-A0D9-625BFF528610}";
+
+    /*Price field IDs*/
+    const string PriceTitleFieldID = "{FA41F9E2-6CF2-4093-8886-ED29973A208C}";
+    const string PriceFeaturedFieldID = "{FF6C6B14-AC5E-4455-B70B-F2B2C652A5B1}";
+    const string PriceFeaturedTextFieldID = "{6F0AAF71-044D-4CCA-8992-14360E6651BB}";
+    const string PriceImage1FieldID = "{D6B00087-66F4-4FCE-A44A-14CCE719A0EE}";
+    const string PriceImage2FieldID = "{D591EAFF-D12C-41A2-A5ED-65C02284E31C}";
+    const string PriceMainContentFieldID = "{19D438FB-01BB-463B-9774-5DC836C4CAC8}";
+    const string PricePriceTextFieldID = "{73F96B6B-57AE-44B8-819A-5841AD945101}";
+    const string PricePaymentFrequencyFieldID = "{9C74B117-1D5B-491E-8BEF-E76778865DA0}";
+    const string PriceCTAUrlFieldID = "{929E452B-2DA1-4584-8F08-D80092F4D132}";
+    const string PriceCTATextFieldID = "{C1612CAF-622C-4E74-BEC7-06B53F4E7F49}";
+}
+
+@if (Model.DataSourceItem != null || Html.Sxa().IsEdit)
+{
+    <div @Html.Sxa().Component(Model.Rendering.RenderingCssClass ?? "pricing-tiles", Model.Attributes)>
+        <div class="component-content">
+            @if (Model.DataSourceItem == null)
+            {
+                @Model.MessageIsEmpty
+            }
+            else
+            {
+                using (Html.Sxa().BeginEditFrame(Model.DataSourceItem.ID.ToString(), "Price Tile", Model.IsControlEditable))
+                {
+                    var dataSourceItem = Model.DataSourceItem;
+                    var dataSourceField = (Sitecore.Data.Fields.MultilistField)dataSourceItem.Fields[PriceTileDatasourceFieldID];
+                    <div class="price-list-slick">
+                        @foreach (Item price in dataSourceField.GetItems())
+                        {
+                            <div class="col-xs-12 col-md-3 mb-3 mb-md-0">
+                                <div class="pricing-tiles bg-xlight">
+                                    @if (((Sitecore.Data.Fields.CheckboxField)price.Fields[PriceFeaturedFieldID]).Checked)
+                                    {
+                                        <div class="feature">
+                                            <div>@price.Fields[PriceFeaturedTextFieldID].Value</div>
+                                        </div>
+                                    }
+
+                                    <div class="title-with-description small">
+                                        <div class="title">
+                                            @price.Fields[PriceTitleFieldID].Value
+                                        </div>
+                                        <div class="seperator"></div>
+                                    </div>
+
+                                    @{
+                                        var image1MediaItem = ((Sitecore.Data.Fields.ImageField)price.Fields[PriceImage1FieldID]).MediaItem;
+                                        var image2MediaItem = ((Sitecore.Data.Fields.ImageField)price.Fields[PriceImage2FieldID]).MediaItem;
+                                    }
+
+                                    <div class="brand-options">
+
+                                        @if (image1MediaItem != null && image2MediaItem == null)
+                                        {
+                                            <img src="@Sitecore.Resources.Media.MediaManager.GetMediaUrl(image1MediaItem)" />
+                                        }
+                                        else if (image2MediaItem != null && image1MediaItem == null)
+                                        {
+                                            <img src="@Sitecore.Resources.Media.MediaManager.GetMediaUrl(image2MediaItem)" />
+                                        }
+                                        else
+                                        {
+                                            <img src="@Sitecore.Resources.Media.MediaManager.GetMediaUrl(image1MediaItem)" />
+                                            <img src="@Sitecore.Resources.Media.MediaManager.GetMediaUrl(image2MediaItem)" />
+                                        }
+
+                                    </div>
+
+                                    @Html.Raw(price.Fields[PriceMainContentFieldID].Value)
+
+                                    <div class="mx-auto">
+                                        <div class="from">@price.Fields["From Text"].Value</div>
+                                        <div class="value">
+                                            <div class="price">@price.Fields[PricePriceTextFieldID].Value</div>
+                                            <div class="duration">/ @price.Fields[PricePaymentFrequencyFieldID].Value</div>
+                                        </div>
+                                    </div>
+
+                                    @{
+                                        var ctaUrlField = (Sitecore.Data.Fields.LinkField)price.Fields[PriceCTAUrlFieldID];
+                                    }
+
+                                    @if (!string.IsNullOrEmpty(ctaUrlField.GetFriendlyUrl()))
+                                    {
+                                        <div class="mx-auto">
+                                            <a href="@ctaUrlField.GetFriendlyUrl()" target="@ctaUrlField.Target" class="btn btn-primary">@price.Fields[PriceCTATextFieldID].Value</a>
+                                        </div>
+                                    }                                    
+                                </div>
+                            </div>
+                        }
+                    </div>
+                }
+            }
+        </div>
+    </div>
+}
+
+
+// ...
+
+
