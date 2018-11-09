@@ -1,0 +1,97 @@
+@using Sitecore.XA.Foundation.MarkupDecorator.Extensions
+@using Sitecore.XA.Foundation.RenderingVariants.Extensions
+@using Sitecore.XA.Foundation.RenderingVariants.Fields
+@using Sitecore.XA.Foundation.SitecoreExtensions.Extensions
+@using Sitecore.XA.Foundation.Variants.Abstractions.Fields
+@using Sitecore.Data.Fields;
+@model Sitecore.XA.Foundation.Variants.Abstractions.Models.VariantsRenderingModel
+
+@if (Model.DataSourceItem != null || Html.Sxa().IsEdit)
+{
+    <div @Html.Sxa().Component(Model.Rendering.RenderingCssClass ?? "slick-carousel", Model.Attributes)>
+        <div class="component-content">
+            @if (Model.DataSourceItem == null)
+            {
+                @Model.MessageIsEmpty
+            }
+            else
+            {
+                var placeholderName = "slick-carousel-" + Model.Rendering.UniqueId.ToString();
+                var renderingReferences = Sitecore.Context.Item.Visualization.GetRenderings(Sitecore.Context.Device, true);
+                var renderingsInPlaceholder = renderingReferences.Where(r => r.Placeholder.EndsWith('/' + placeholderName, StringComparison.OrdinalIgnoreCase));
+                int numberOfRenderingsInPlaceholder = renderingsInPlaceholder.Count();
+
+                int numberOfSlides = numberOfRenderingsInPlaceholder;
+                using (Html.Sxa().BeginEditFrame(Model.DataSourceItem.ID.ToString(), "Slick Carousel", Model.IsControlEditable))
+                {
+                    // Component datasource fields for reference; remove when not needed anymore
+                    <div>
+                        @{
+                            // Checkbox fields
+                            bool isAutoplay = ((CheckboxField)Model.DataSourceItem.Fields["AutoPlay"]).Checked;
+                            bool isDisabledDesktop = ((CheckboxField)Model.DataSourceItem.Fields["Disabled on Desktop"]).Checked;
+                            bool isDisabledMobile = ((CheckboxField)Model.DataSourceItem.Fields["Disabled on Mobile"]).Checked;
+                            bool showDotsOnMobile = !((CheckboxField)Model.DataSourceItem.Fields["Hide Dots On Mobile"]).Checked;
+                            bool showDotsOnDesktop = !((CheckboxField)Model.DataSourceItem.Fields["Hide Dots On Desktop"]).Checked;
+                            bool infiniteLoop = ((CheckboxField) Model.DataSourceItem.Fields["Infinite Loop"]).Checked;
+                            bool showArrowsOnDesktop = ((CheckboxField)Model.DataSourceItem.Fields["Show Arrows On Desktop"]).Checked;
+                            bool showArrowsOnMobile = ((CheckboxField) Model.DataSourceItem.Fields["Show Arrows on Mobile"]).Checked;
+                            string defaultSpeed = "5000";
+                        }
+                    </div>
+
+                    if (Html.Sxa().IsEdit)
+                    {
+                        
+                        <div class="custom-carousel" data-editmode="1">
+                            @Html.Sitecore().Placeholder(placeholderName)
+                        </div>
+                    }
+                    else
+                    {
+                        var dataCarouselConfig = new
+                        {
+                            mobile = new
+                            {
+                                arrows = showArrowsOnMobile,
+                                sideMargin = Model.DataSourceItem.Fields["Side Margin Mobile"].Value ?? "", // eg= 5px
+                                sidePadding = "", // eg= 12px;
+                                autoplay = isAutoplay,
+                                centerMode = false,
+                                dots = showDotsOnMobile,
+                                infinite = infiniteLoop,
+                                slidesToShow = Model.DataSourceItem.Fields["Items to Show on Mobile"].Value ?? "3",
+                                slidesToScroll = 1,
+                                variableWidth = ((CheckboxField)Model.DataSourceItem.Fields["Enable Variable Width Mobile"]).Checked,
+                                speed = Model.DataSourceItem.Fields["AutoPlay Speed"].Value ?? defaultSpeed,
+                                unslick = isDisabledMobile
+                            },
+                            desktop = new
+                            {
+                                arrows = showArrowsOnDesktop,
+                                autoplay = isAutoplay,
+                                sideMargin = Model.DataSourceItem.Fields["Side Margin Desktop"].Value ?? "", // eg= 5px
+                                speed = Model.DataSourceItem.Fields["AutoPlay Speed"].Value ?? defaultSpeed,
+                                slidesToShow = Model.DataSourceItem.Fields["Items to Show on Desktop"].Value ?? "1",
+                                slidesToScroll = 1,
+                                unslick = isDisabledDesktop,
+                                dots = showDotsOnDesktop,
+                                variableWidth= ((CheckboxField)Model.DataSourceItem.Fields["Enable Variable Width Desktop"]).Checked
+                            }
+                        };
+                        var dotColour = (Sitecore.Data.Fields.LookupField)Model.DataSourceItem.Fields["Dot Colour"];
+                        string dotCssClassName = string.Empty;
+                        if (dotColour.TargetItem != null)
+                        {
+                            dotCssClassName = dotColour.TargetItem.Fields["CSS Class Name"].Value;
+                        }
+                        string dataCarouselConfigJson = Json.Encode(dataCarouselConfig);
+                        <div class="custom-carousel @dotCssClassName" data-carousel-config="@dataCarouselConfigJson">
+                            @Html.Sitecore().Placeholder(placeholderName)
+                        </div>
+                    }
+                }
+            }
+        </div>
+    </div>
+}
